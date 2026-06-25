@@ -93,6 +93,9 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     self._send(404, {"error": "not found"})
 
+        elif path == "health":
+            self._send(200, {"status": "ok", "mongo": use_mongo})
+
         elif path == "stats":
             database = get_db()
             if database is not None:
