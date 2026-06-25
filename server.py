@@ -349,6 +349,33 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, {"user_id": user_id, "login": login})
             return
 
+        if path == "login":
+            login = body.get("login", "")
+            password = body.get("password", "")
+            if not login or not password:
+                self._send(400, {"error": "login and password required"})
+                return
+            database = get_db()
+            if database is not None:
+                user = database.users.find_one({"login": login}, {"_id": 0})
+                if not user:
+                    self._send(404, {"error": "not found"})
+                    return
+                if user.get("password", "") != password:
+                    self._send(401, {"error": "Неверный пароль"})
+                    return
+                self._send(200, user)
+            else:
+                users = _load_json("users", {})
+                if login not in users:
+                    self._send(404, {"error": "not found"})
+                    return
+                if users[login].get("password", "") != password:
+                    self._send(401, {"error": "Неверный пароль"})
+                    return
+                self._send(200, users[login])
+            return
+
         if path.startswith("get_id/"):
             login = path[7:]
             database = get_db()

@@ -117,8 +117,10 @@ func _on_action_pressed() -> void:
 			_fetch_global_id_async(login)
 			return
 		else:
-			_show_error("Неверный пароль")
-		return
+			_pending_login = login
+			_pending_password = password
+			_verify_password_on_server(login, password)
+			return
 
 	if get_account_count() >= MAX_ACCOUNTS:
 		_show_error("Максимум " + str(MAX_ACCOUNTS) + " аккаунтов")
@@ -136,6 +138,16 @@ func _register_on_server(login: String) -> void:
 	if error != OK:
 		_finish_registration(login, _pending_password, _get_local_next_id())
 
+func _verify_password_on_server(login: String, password: String) -> void:
+	var url = SERVER_URL + "/login"
+	var headers = ["Content-Type: application/json"]
+	var body = JSON.stringify({"login": login, "password": password})
+	var error = http_request.request(url, headers, HTTPClient.METHOD_POST, body)
+	if error != OK:
+		_show_error("Ошибка сервера")
+		_pending_login = ""
+		_pending_password = ""
+
 func _fetch_global_id_async(login: String) -> void:
 	var url = SERVER_URL + "/register"
 	var headers = ["Content-Type: application/json"]
@@ -148,7 +160,19 @@ func _fetch_global_id_async(login: String) -> void:
 		pass
 
 func _on_http_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
-	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		if _pending_login != "":
+			_finish_registration(_pending_login, _pending_password, _get_local_next_id())
+		return
+
+	if response_code == 401:
+		if _pending_login != "":
+			_show_error("Неверный пароль")
+			_pending_login = ""
+			_pending_password = ""
+		return
+
+	if response_code != 200:
 		if _pending_login != "":
 			_finish_registration(_pending_login, _pending_password, _get_local_next_id())
 		return
