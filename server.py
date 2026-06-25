@@ -39,18 +39,12 @@ def _init_defaults():
 
 _init_defaults()
 
-# Try MongoDB on startup
-try:
-    get_db()
-except Exception:
-    pass
-
 def get_db():
     global client, db, use_mongo
     if db is not None:
         return db
     if not MONGO_URI:
-        print("[INFO] No MONGO_URI, using file storage")
+        print("[INFO] No MONGO_URI, using file storage", flush=True)
         return None
     try:
         from pymongo import MongoClient
@@ -63,15 +57,21 @@ def get_db():
         client.admin.command("ping")
         db = client["casenova"]
         use_mongo = True
-        print("[OK] MongoDB connected")
+        print("[OK] MongoDB connected", flush=True)
         return db
     except Exception as e:
-        print(f"[WARN] MongoDB connection failed: {e}")
+        print(f"[WARN] MongoDB connection failed: {e}", flush=True)
         traceback.print_exc()
         client = None
         db = None
         use_mongo = False
         return None
+
+# Try MongoDB on startup
+try:
+    get_db()
+except Exception:
+    pass
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -374,10 +374,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 PORT = int(os.environ.get("PORT", 10000))
-print(f"Server starting on port {PORT}")
-print(f"MONGO_URI set: {bool(MONGO_URI)}")
+print(f"Server starting on port {PORT}", flush=True)
+print(f"MONGO_URI set: {bool(MONGO_URI)}", flush=True)
 if MONGO_URI:
-    print(f"MONGO_URI prefix: {MONGO_URI[:20]}...")
+    print(f"MONGO_URI prefix: {MONGO_URI[:20]}...", flush=True)
 server = HTTPServer(("0.0.0.0", PORT), Handler)
-print(f"Server running on port {PORT} (mongo={use_mongo})")
+print(f"Server running on port {PORT} (mongo={use_mongo})", flush=True)
 server.serve_forever()
