@@ -56,9 +56,9 @@ def get_db():
         from pymongo import MongoClient
         client = MongoClient(
             MONGO_URI,
-            serverSelectionTimeoutMS=10000,
-            connectTimeoutMS=10000,
-            socketTimeoutMS=10000,
+            serverSelectionTimeoutMS=15000,
+            connectTimeoutMS=15000,
+            socketTimeoutMS=15000,
         )
         client.admin.command("ping")
         db = client["casenova"]
