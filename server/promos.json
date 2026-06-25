@@ -1,0 +1,25 @@
+{
+  "CODES": {
+    "WELCOME": {
+      "type": "silver",
+      "amount": 500,
+      "description": "Приветственный бонус"
+    },
+    "LAUNCH": {
+      "type": "gold",
+      "amount": 10,
+      "description": "Запуск игры"
+    },
+    "STANDOFF": {
+      "type": "silver",
+      "amount": 1000,
+      "description": "Standoff 2 фанат"
+    },
+    "GOLD670": {
+      "type": "gold",
+      "amount": 670,
+      "description": "Золотой бонус"
+    }
+  },
+  "used": {}
+}
