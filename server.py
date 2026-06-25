@@ -44,22 +44,20 @@ def get_db():
     if db is not None:
         return db
     if not MONGO_URI:
+        print("[INFO] No MONGO_URI, using file storage")
         return None
     try:
-        import certifi
-        import pymongo
         from pymongo import MongoClient
         client = MongoClient(
             MONGO_URI,
-            tls=True,
-            tlsCAFile=certifi.where(),
-            serverSelectionTimeoutMS=5000,
-            connectTimeoutMS=5000,
-            socketTimeoutMS=5000,
+            serverSelectionTimeoutMS=10000,
+            connectTimeoutMS=10000,
+            socketTimeoutMS=10000,
         )
         client.admin.command("ping")
         db = client["casenova"]
         use_mongo = True
+        print("[OK] MongoDB connected")
         return db
     except Exception as e:
         print(f"[WARN] MongoDB connection failed: {e}")
