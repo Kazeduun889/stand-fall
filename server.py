@@ -39,6 +39,12 @@ def _init_defaults():
 
 _init_defaults()
 
+# Try MongoDB on startup
+try:
+    get_db()
+except Exception:
+    pass
+
 def get_db():
     global client, db, use_mongo
     if db is not None:
@@ -368,6 +374,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 PORT = int(os.environ.get("PORT", 10000))
+print(f"Server starting on port {PORT}")
+print(f"MONGO_URI set: {bool(MONGO_URI)}")
+if MONGO_URI:
+    print(f"MONGO_URI prefix: {MONGO_URI[:20]}...")
 server = HTTPServer(("0.0.0.0", PORT), Handler)
-print(f"Server running on port {PORT} (mongo={MONGO_URI != ''})")
+print(f"Server running on port {PORT} (mongo={use_mongo})")
 server.serve_forever()
