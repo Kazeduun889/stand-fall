@@ -25,6 +25,20 @@ def _save_json(name, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+def _init_defaults():
+    src_promos = os.path.join(os.path.dirname(os.path.abspath(__file__)), "server", "promos.json")
+    dst_promos = os.path.join(DATA_DIR, "promos.json")
+    if not os.path.exists(dst_promos) and os.path.exists(src_promos):
+        with open(src_promos, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        _save_json("promos", data)
+    if not os.path.exists(os.path.join(DATA_DIR, "counters.json")):
+        _save_json("counters", {"next_id": 1000000})
+    if not os.path.exists(os.path.join(DATA_DIR, "users.json")):
+        _save_json("users", {})
+
+_init_defaults()
+
 def get_db():
     global client, db, use_mongo
     if db is not None:
